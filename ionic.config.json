@@ -1,0 +1,8 @@
+{
+  "name": "runny_ionic_prototype",
+  "app_id": "",
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  }
+}
