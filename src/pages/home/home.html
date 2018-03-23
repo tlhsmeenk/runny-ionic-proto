@@ -3,16 +3,18 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Home</ion-title>
+    <ion-title>Runny Prototype Tester</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  <h3>Ionic Menu Starter</h3>
+  <h3>Used to test-drive the runny NodeJS prototype</h3>
 
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will show you the way.
-  </p>
+  <ion-input required placeholder="Host to connect to" [(ngModel)]="host"></ion-input>
+  <ion-input required placeholder="Your name" [(ngModel)]="name"></ion-input>
 
-  <button ion-button secondary menuToggle>Toggle Menu</button>
+  <button ion-button icon-start (click)="connect()">
+    <ion-icon name="md-wifi"></ion-icon>
+    Connect
+  </button>
 </ion-content>

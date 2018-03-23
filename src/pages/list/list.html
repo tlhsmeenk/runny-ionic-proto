@@ -3,11 +3,17 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>List</ion-title>
+    <ion-title>Run</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
+  <ion-input [(ngModel)]="name">Username</ion-input>
+  <ion-input required placeholder="Enter run-id to join!" [(ngModel)]=runToJoin></ion-input>
+  <button ion-button icon-start (click)="joinRun()">
+    <ion-icon name="add"></ion-icon>
+    Join!
+  </button>
   <ion-list>
     <button ion-item *ngFor="let item of items" (click)="itemTapped($event, item)">
       <ion-icon [name]="item.icon" item-start></ion-icon>
@@ -17,7 +23,7 @@
       </div>
     </button>
   </ion-list>
-  <div *ngIf="selectedItem" padding>
+  <div *ngIf="show" padding>
     You navigated here from <b>{{selectedItem.title}}</b>
   </div>
 </ion-content>
