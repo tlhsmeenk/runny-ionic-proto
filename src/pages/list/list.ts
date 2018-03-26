@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { ToastController } from 'ionic-angular';
+import { RunPage} from '../run/run'
 
 @Component({
   selector: 'page-list',
@@ -17,6 +18,8 @@ export class ListPage {
   name: string
   runToJoin: string
   ready: boolean
+  allReady: boolean
+  runStarted: boolean
 
   constructor(public navCtrl: NavController, public navParams: NavParams,private toastCtrl: ToastController) {
     // If we navigated to this page, we will have an item available as a nav param
@@ -26,6 +29,8 @@ export class ListPage {
     this.runToJoin = navParams.get(`runid`)
     this.setRunHandlers(this.socket)
     this.ready = false
+    this.allReady = false
+    this.runStarted = false
 
     //set the user name for this session
     this.socket.send(JSON.stringify({'type':'setname', 'payload':{ 'name': this.name}}))
@@ -53,6 +58,10 @@ export class ListPage {
             break
           case 'runnerReadyResponse':
             this.setRunnerReady(msgAsJson['payload'])
+            break;
+          case 'runStarted':
+            this.navCtrl.push(RunPage)
+            break
           case 'error':
           case 'info':
             this.inform(msgAsJson['payload'].message)
@@ -69,9 +78,16 @@ export class ListPage {
     }
     this.items.forEach((item, index) => {
         if(item.title === payload.name){
-          payload.state ? item.note = 'Ready' : 'Not Ready'
+          var value = payload.state ? 'Ready' : 'Not Ready'
+          item.note = value
         }
     })
+
+    this.allReady = this.allRunnersReady()
+  }
+
+  allRunnersReady(){
+    return !this.items.find(e => e.note === 'Not Ready') || this.runStarted
   }
 
   rebuildRunners(payload){
@@ -79,7 +95,7 @@ export class ListPage {
       payload.runners.forEach((item, index) => {
         this.items.push({
           title: item,
-          note: 'Not ready',
+          note: 'Not Ready',
           icon: 'wifi'
         });
     });
@@ -120,14 +136,18 @@ export class ListPage {
   }
 
   joinRun(){
-    this.socket.send(JSON.stringify({'type':'join', 'payload':{'runtojoin':this.runToJoin}}))
+    if(this.allReady){
+      this.socket.send(JSON.stringify({'type':'startRun'}))
+    } else {
+      this.socket.send(JSON.stringify({'type':'join', 'payload':{'runtojoin':this.runToJoin}}))
+    }
   }
 
   itemTapped(event, item) {
     if(item.title === this.name){
       this.socket.send(JSON.stringify({'type':'runnerReady', 'payload':{'name':item.title, 'state':!this.ready}}))
     } else {
-      this.inform('You cannot force any other runners to be ready!')
+      this.inform('You cannot force other runners to be ready!')
     }
 
   }
