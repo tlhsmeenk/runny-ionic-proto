@@ -60,7 +60,7 @@ export class ListPage {
             this.setRunnerReady(msgAsJson['payload'])
             break;
           case 'runStarted':
-            this.navCtrl.push(RunPage)
+            this.navCtrl.push(RunPage, {socket: this.socket})
             break
           case 'error':
           case 'info':
