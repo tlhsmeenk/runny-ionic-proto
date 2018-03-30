@@ -33,7 +33,7 @@ export class ListPage {
     this.runStarted = false
 
     //set the user name for this session
-    this.socket.send(JSON.stringify({'type':'setname', 'payload':{ 'name': this.name}}))
+    this.socket.send(JSON.stringify({'type':'set-name', 'payload':{ 'name': this.name}}))
 
     this.items = [];
     this.items.push({
@@ -41,7 +41,6 @@ export class ListPage {
       note: 'Not ready',
       icon: 'wifi'
     });
-
   }
 
   setRunHandlers(socket){
@@ -50,16 +49,16 @@ export class ListPage {
         let type = msgAsJson['type']
 
         switch(type){
-          case 'joined':
+          case 'join_response':
             this.handleJoined(msgAsJson['payload'])
             break
-          case 'getRunnerResponse':
+          case 'get-runners_response':
             this.rebuildRunners(msgAsJson['payload'])
             break
-          case 'runnerReadyResponse':
+          case 'runner-readystate-update_response':
             this.setRunnerReady(msgAsJson['payload'])
             break;
-          case 'runStarted':
+          case 'start-run_response':
             this.navCtrl.push(RunPage, {socket: this.socket})
             break
           case 'error':
@@ -103,14 +102,14 @@ export class ListPage {
 
   handleJoined(payload){
     if(payload.name === this.name){
-      this.socket.send(JSON.stringify({'type':'getRunners'}))
+      this.socket.send(JSON.stringify({'type':'get-runners'}))
     } else {
       this.addRunner(payload.name)
     }
   }
 
   reinitRunners(){
-      this.socket.send(JSON.stringify({'type':'join', 'payload':{'runtojoin':this.runToJoin}}))
+      this.socket.send(JSON.stringify({'type':'join', 'payload':{'run-to-join':this.runToJoin}}))
   }
 
   addRunner(name){
@@ -137,15 +136,15 @@ export class ListPage {
 
   joinRun(){
     if(this.allReady){
-      this.socket.send(JSON.stringify({'type':'startRun'}))
+      this.socket.send(JSON.stringify({'type':'start-run'}))
     } else {
-      this.socket.send(JSON.stringify({'type':'join', 'payload':{'runtojoin':this.runToJoin}}))
+      this.socket.send(JSON.stringify({'type':'join', 'payload':{'run-to-join':this.runToJoin}}))
     }
   }
 
   itemTapped(event, item) {
     if(item.title === this.name){
-      this.socket.send(JSON.stringify({'type':'runnerReady', 'payload':{'name':item.title, 'state':!this.ready}}))
+      this.socket.send(JSON.stringify({'type':'runner-readystate-update', 'payload':{'name':item.title, 'state':!this.ready}}))
     } else {
       this.inform('You cannot force other runners to be ready!')
     }

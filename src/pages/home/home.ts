@@ -14,7 +14,7 @@ export class HomePage {
 
   constructor(public navCtrl: NavController,private toastCtrl: ToastController) {
       //default dev host
-      this.host = "ws://172.25.33.178:9000"
+      this.host = "ws://10.0.2.15:9000"
   }
 
   connect() {
