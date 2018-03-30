@@ -11,6 +11,7 @@ export class RunPage {
   socket: WebSocket
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private geolocation: Geolocation) {
+    this.items = []
     this.socket = navParams.get(`socket`)
     this.setRunHandlers(this.socket)
     this.initGeo()
@@ -22,7 +23,7 @@ export class RunPage {
         let type = msgAsJson['type']
 
         switch(type){
-          case 'update':
+          case 'runner-update_response':
             this.onUpdate(msgAsJson['payload'])
             break
           default:
@@ -32,22 +33,24 @@ export class RunPage {
   }
 
   initGeo() {
-    console.log('setting up geo')
     this.geolocation.getCurrentPosition().then((resp) => {
-     console.log('{initial}:' + resp.coords)
+     this.socket.send(JSON.stringify({'type': 'update', 'payload': { 'longtitude': resp.coords.longitude, 'latitude':  resp.coords.latitude}}))
     }).catch((error) => {
       console.log('Error getting location', error);
     });
 
     let watch = this.geolocation.watchPosition();
     watch.subscribe((data) => {
-     console.log('{initial}:'+data.coords)
-     this.socket.send({'type': 'update', 'payload': { 'longtitude': data.coords.longitude, 'latitude':  data.coords.latitude}})
+     this.socket.send(JSON.stringify({'type': 'update', 'payload': { 'longtitude': data.coords.longitude, 'latitude':  data.coords.latitude}}))
     });
   }
 
   onUpdate(payload){
-    console.log(payload)
+    this.items.push({
+      title: payload['runner'],
+      note: payload['distance'],
+      icon: 'ion-android-arrow-up'
+    });
   }
 
   itemTapped(event, item) {
